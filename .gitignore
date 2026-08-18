@@ -2,3 +2,8 @@
 build/
 .packages
 pubspec.lock
+
+# flutter create qoldiqlari
+.idea/
+*.iml
+ios/Flutter/ephemeral/
