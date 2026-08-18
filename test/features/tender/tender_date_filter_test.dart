@@ -17,4 +17,18 @@ void main() {
     expect(api.lastFrom, DateTime(2026, 8, 5));
     expect(controller.state.items.map((t) => t.id), [2]);
   });
+
+  test('CU-DEMO002 AC-2: teskari sana oralig`ida so`rov yuborilmaydi', () async {
+    final api = FakeTenderApi(items: sampleTenders);
+    final controller = TenderListController(TenderRepository(api));
+
+    await controller.load(
+      from: DateTime(2026, 8, 20),
+      to: DateTime(2026, 8, 5),
+    );
+
+    expect(api.callCount, 0, reason: 'API chaqirilmasligi kerak');
+    expect(controller.state.status, TenderListStatus.error);
+    expect(controller.state.errorMessage, "Sana oralig'i noto'g'ri");
+  });
 }
