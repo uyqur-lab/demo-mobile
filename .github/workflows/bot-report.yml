@@ -84,8 +84,11 @@ jobs:
           id="$(grep -oE 'CU-[a-zA-Z0-9]+' <<<"$BRANCH" | head -1 || true)"
           [ -z "$id" ] && { echo "CU-id yo'q — o'tkazib yuborildi"; exit 0; }
           task="${id#CU-}"
-          curl -sS -X PUT "https://api.clickup.com/api/v2/task/$task" \
-               -H "Authorization: $CLICKUP_TOKEN" \
-               -H "Content-Type: application/json" \
-               -d '{"status":"in review"}' >/dev/null
-          echo "ClickUp $id → in review"
+          # Status nomi status-map.json dan olinadi — workspace'ga bog'liq.
+          status="$(jq -r '.pr_opened' .github/status-map.json)"
+          jq -n --arg s "$status" '{status: $s}' | \
+            curl -sS -X PUT "https://api.clickup.com/api/v2/task/$task" \
+                 -H "Authorization: $CLICKUP_TOKEN" \
+                 -H "Content-Type: application/json" \
+                 -d @- >/dev/null
+          echo "ClickUp $id → $status"
