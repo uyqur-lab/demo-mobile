@@ -6,10 +6,12 @@ class Tender {
     required this.title,
     required this.status,
     required this.amountInTiyin,
+    required this.createdAt,
   });
 
   final int id;
   final String title;
   final TenderStatus status;
   final int amountInTiyin;
+  final DateTime createdAt;
 }

@@ -5,7 +5,9 @@
 # sanaydi. Kod dalilini tekshirish va spec'dan tashqari o'zgarishlarni topish
 # `/task-check` buyrug'ining vazifasi.
 #
-# Konvensiya: test nomi `AC-<raqam>:` bilan BOSHLANADI (dev-rules.md §4).
+# Konvensiya: test nomi `<CU-id> AC-<raqam>:` bilan BOSHLANADI (dev-rules.md §4).
+# Task id majburiy: AC raqamlari har spec ichida 1 dan boshlanadi, shuning uchun
+# yolg'iz `AC-2:` boshqa taskning testiga tushib qolishi mumkin.
 set -uo pipefail
 
 TEST_DIRS="${AC_GATE_TEST_DIRS:-test integration_test}"
@@ -63,7 +65,7 @@ while IFS= read -r line; do
   hits=0
   for d in $TEST_DIRS; do
     [ -d "$d" ] || continue
-    n="$(grep -rEho "['\"]AC-$num:" "$d" 2>/dev/null | wc -l | tr -d ' ')"
+    n="$(grep -rEho "['\"]$id AC-$num:" "$d" 2>/dev/null | wc -l | tr -d ' ')"
     hits=$((hits + n))
   done
 
@@ -73,7 +75,7 @@ while IFS= read -r line; do
   else
     missing=$((missing + 1))
     printf 'AC-%-3s ⛔ TEST YO`Q\n' "$num"
-    echo "::error::AC-$num uchun test topilmadi. Test nomi \"AC-$num:\" bilan boshlanishi kerak."
+    echo "::error::AC-$num uchun test topilmadi. Test nomi \"$id AC-$num:\" bilan boshlanishi kerak."
   fi
 done < <(grep -E '^-[[:space:]]+AC-[0-9]+' "$spec")
 

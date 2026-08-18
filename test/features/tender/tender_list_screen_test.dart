@@ -10,7 +10,7 @@ Widget _wrap(TenderListController controller) =>
     MaterialApp(home: TenderListScreen(controller: controller));
 
 void main() {
-  testWidgets('AC-2: bo`sh natijada "Natija topilmadi" ko`rsatiladi', (tester) async {
+  testWidgets('CU-DEMO001 AC-2: bo`sh natijada "Natija topilmadi" ko`rsatiladi', (tester) async {
     final controller = TenderListController(TenderRepository(FakeTenderApi(items: const [])));
 
     await tester.pumpWidget(_wrap(controller));
@@ -20,7 +20,7 @@ void main() {
     expect(find.text('Natija topilmadi'), findsOneWidget);
   });
 
-  testWidgets('AC-3: xato holatida xabar ko`rinadi va ro`yxat saqlanadi', (tester) async {
+  testWidgets('CU-DEMO001 AC-3: xato holatida xabar ko`rinadi va ro`yxat saqlanadi', (tester) async {
     final api = FakeTenderApi(items: sampleTenders);
     final controller = TenderListController(TenderRepository(api));
 
@@ -36,7 +36,7 @@ void main() {
     expect(find.byKey(const Key('tender_1')), findsOneWidget);
   });
 
-  testWidgets('AC-4: ro`yxatda summa formatlangan holda chiqadi', (tester) async {
+  testWidgets('CU-DEMO001 AC-4: ro`yxatda summa formatlangan holda chiqadi', (tester) async {
     final controller = TenderListController(TenderRepository(FakeTenderApi(items: sampleTenders)));
 
     await tester.pumpWidget(_wrap(controller));

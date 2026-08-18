@@ -1,0 +1,91 @@
+name: bot-report
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# Bot identity: hisobot PR'ga `uyqur-ai-bot` nomidan yoziladi, dev nomidan emas.
+# Sabab: "kim yozdi" savoli har doim aniq javobga ega bo'lishi kerak.
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Bot tokenini olish
+        id: token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: AC gate natijasini yig'ish
+        id: gate
+        env:
+          AC_GATE_LAYER: ${{ vars.AC_GATE_LAYER }}
+        run: |
+          set +e
+          out="$(bash .github/scripts/ac-gate.sh 2>&1)"
+          code=$?
+          set -e
+          {
+            echo 'text<<GATE_EOF'
+            echo "$out"
+            echo 'GATE_EOF'
+          } >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+
+      - name: Hisobotni PR'ga yozish
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          GATE_TEXT: ${{ steps.gate.outputs.text }}
+          GATE_CODE: ${{ steps.gate.outputs.code }}
+        run: |
+          marker='<!-- uyqur-ac-gate -->'
+          if [ "$GATE_CODE" = "0" ]; then verdict='✅ **GATE: OCHIQ**'; else verdict='⛔ **GATE: YOPIQ**'; fi
+
+          body="$marker
+          ## AC gate
+
+          $verdict
+
+          \`\`\`
+          $GATE_TEXT
+          \`\`\`
+
+          <sub>Qoidalar: [dev-rules.md](https://github.com/uyqur-lab/agent-standards/blob/main/rules/dev-rules.md) · lokal tekshiruv: \`/task-check\`</sub>"
+
+          # Sticky comment: mavjud bo'lsa yangilanadi, yo'q bo'lsa yaratiladi.
+          id="$(gh api "repos/$REPO/issues/$PR/comments" --jq \
+                ".[] | select(.body | startswith(\"$marker\")) | .id" | head -1)"
+
+          # JSON'ni jq bilan quramiz — matnda maxsus belgilar bo'lsa ham buzilmaydi.
+          payload="$(jq -n --arg b "$body" '{body: $b}')"
+
+          if [ -n "$id" ]; then
+            echo "$payload" | gh api -X PATCH "repos/$REPO/issues/comments/$id" --input - >/dev/null
+            echo "Hisobot yangilandi (comment $id)"
+          else
+            echo "$payload" | gh api -X POST "repos/$REPO/issues/$PR/comments" --input - >/dev/null
+            echo "Hisobot yozildi"
+          fi
+
+      - name: ClickUp statusini yangilash
+        if: ${{ steps.gate.outputs.code == '0' && env.CLICKUP_TOKEN != '' }}
+        env:
+          CLICKUP_TOKEN: ${{ secrets.CLICKUP_TOKEN }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          id="$(grep -oE 'CU-[a-zA-Z0-9]+' <<<"$BRANCH" | head -1 || true)"
+          [ -z "$id" ] && { echo "CU-id yo'q — o'tkazib yuborildi"; exit 0; }
+          task="${id#CU-}"
+          curl -sS -X PUT "https://api.clickup.com/api/v2/task/$task" \
+               -H "Authorization: $CLICKUP_TOKEN" \
+               -H "Content-Type: application/json" \
+               -d '{"status":"in review"}' >/dev/null
+          echo "ClickUp $id → in review"

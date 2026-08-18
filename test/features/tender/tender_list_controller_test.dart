@@ -14,7 +14,7 @@ void main() {
     controller = TenderListController(TenderRepository(api));
   });
 
-  test('AC-1: status filtri qo`llanganda faqat mos tenderlar qaytadi', () async {
+  test('CU-DEMO001 AC-1: status filtri qo`llanganda faqat mos tenderlar qaytadi', () async {
     await controller.load(filter: TenderStatus.active);
 
     expect(api.lastRequestedStatus, TenderStatus.active);
@@ -22,7 +22,7 @@ void main() {
     expect(controller.state.items.map((t) => t.id), [1, 3]);
   });
 
-  test('AC-1: filtr olib tashlanganda barcha tenderlar qaytadi', () async {
+  test('CU-DEMO001 AC-1: filtr olib tashlanganda barcha tenderlar qaytadi', () async {
     await controller.load(filter: TenderStatus.active);
     await controller.load(clearFilter: true);
 
@@ -30,7 +30,7 @@ void main() {
     expect(controller.state.items, hasLength(3));
   });
 
-  test('AC-2: natija bo`sh bo`lganda empty holati o`rnatiladi', () async {
+  test('CU-DEMO001 AC-2: natija bo`sh bo`lganda empty holati o`rnatiladi', () async {
     api = FakeTenderApi(items: const []);
     controller = TenderListController(TenderRepository(api));
 
@@ -40,7 +40,7 @@ void main() {
     expect(controller.state.items, isEmpty);
   });
 
-  test('AC-3: so`rov xato bo`lganda oldingi ro`yxat saqlanadi', () async {
+  test('CU-DEMO001 AC-3: so`rov xato bo`lganda oldingi ro`yxat saqlanadi', () async {
     await controller.load();
     expect(controller.state.items, hasLength(3));
 

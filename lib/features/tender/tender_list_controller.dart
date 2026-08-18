@@ -11,12 +11,16 @@ class TenderListState {
     this.status = TenderListStatus.initial,
     this.items = const [],
     this.filter,
+    this.from,
+    this.to,
     this.errorMessage,
   });
 
   final TenderListStatus status;
   final List<Tender> items;
   final TenderStatus? filter;
+  final DateTime? from;
+  final DateTime? to;
   final String? errorMessage;
 
   TenderListState copyWith({
@@ -24,12 +28,17 @@ class TenderListState {
     List<Tender>? items,
     TenderStatus? filter,
     bool clearFilter = false,
+    DateTime? from,
+    DateTime? to,
+    bool clearRange = false,
     String? errorMessage,
   }) {
     return TenderListState(
       status: status ?? this.status,
       items: items ?? this.items,
       filter: clearFilter ? null : (filter ?? this.filter),
+      from: clearRange ? null : (from ?? this.from),
+      to: clearRange ? null : (to ?? this.to),
       errorMessage: errorMessage,
     );
   }
@@ -47,24 +56,46 @@ class TenderListController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// AC-1: filtr qo'llanganda ro'yxat faqat mos tenderlarni ko'rsatadi.
-  /// AC-2: natija bo'sh bo'lsa `empty` holati.
-  /// AC-3: xato bo'lsa oldingi ro'yxat saqlanadi.
-  Future<void> load({TenderStatus? filter, bool clearFilter = false}) async {
+  /// AC-1: sana oralig'i tanlanganda faqat shu oraliqdagi tenderlar.
+  /// AC-2: oraliq teskari bo'lsa so'rov yuborilmaydi.
+  Future<void> load({
+    TenderStatus? filter,
+    bool clearFilter = false,
+    DateTime? from,
+    DateTime? to,
+    bool clearRange = false,
+  }) async {
+    final nextFrom = clearRange ? null : (from ?? _state.from);
+    final nextTo = clearRange ? null : (to ?? _state.to);
+
+    if (nextFrom != null && nextTo != null && nextFrom.isAfter(nextTo)) {
+      _emit(_state.copyWith(
+        status: TenderListStatus.error,
+        errorMessage: "Sana oralig'i noto'g'ri",
+      ));
+      return;
+    }
+
     _emit(_state.copyWith(
       status: TenderListStatus.loading,
       filter: filter,
       clearFilter: clearFilter,
+      from: from,
+      to: to,
+      clearRange: clearRange,
     ));
 
     try {
-      final items = await _repository.list(status: _state.filter);
+      final items = await _repository.list(
+        status: _state.filter,
+        from: _state.from,
+        to: _state.to,
+      );
       _emit(_state.copyWith(
         status: items.isEmpty ? TenderListStatus.empty : TenderListStatus.data,
         items: items,
       ));
     } catch (e) {
-      // Oldingi ro'yxat ataylab saqlanadi — foydalanuvchi kontekstni yo'qotmaydi.
       _emit(_state.copyWith(
         status: TenderListStatus.error,
         errorMessage: 'Ro`yxatni yuklab bo`lmadi',

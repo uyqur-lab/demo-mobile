@@ -9,20 +9,29 @@ class FakeTenderApi implements TenderApi {
   final List<Tender> _items;
   bool shouldFail = false;
   TenderStatus? lastRequestedStatus;
+  DateTime? lastFrom;
+  DateTime? lastTo;
   int callCount = 0;
 
   @override
-  Future<List<Tender>> fetch({TenderStatus? status}) async {
+  Future<List<Tender>> fetch({TenderStatus? status, DateTime? from, DateTime? to}) async {
     callCount++;
     lastRequestedStatus = status;
+    lastFrom = from;
+    lastTo = to;
     if (shouldFail) throw Exception('tarmoq xatosi');
-    if (status == null) return _items;
-    return _items.where((t) => t.status == status).toList();
+
+    return _items.where((t) {
+      if (status != null && t.status != status) return false;
+      if (from != null && t.createdAt.isBefore(from)) return false;
+      if (to != null && t.createdAt.isAfter(to)) return false;
+      return true;
+    }).toList();
   }
 }
 
-const sampleTenders = [
-  Tender(id: 1, title: 'Sement', status: TenderStatus.active, amountInTiyin: 1250000000),
-  Tender(id: 2, title: 'Armatura', status: TenderStatus.closed, amountInTiyin: 480000000),
-  Tender(id: 3, title: "G'isht", status: TenderStatus.active, amountInTiyin: 99900),
+final sampleTenders = [
+  Tender(id: 1, title: 'Sement', status: TenderStatus.active, amountInTiyin: 1250000000, createdAt: DateTime(2026, 8, 1)),
+  Tender(id: 2, title: 'Armatura', status: TenderStatus.closed, amountInTiyin: 480000000, createdAt: DateTime(2026, 8, 10)),
+  Tender(id: 3, title: "G'isht", status: TenderStatus.active, amountInTiyin: 99900, createdAt: DateTime(2026, 8, 20)),
 ];

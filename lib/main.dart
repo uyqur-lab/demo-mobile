@@ -26,12 +26,16 @@ class _InMemoryTenderApi implements TenderApi {
   const _InMemoryTenderApi();
 
   @override
-  Future<List<Tender>> fetch({TenderStatus? status}) async {
-    const all = [
-      Tender(id: 1, title: 'Sement yetkazish', status: TenderStatus.active, amountInTiyin: 1250000000),
-      Tender(id: 2, title: 'Armatura', status: TenderStatus.closed, amountInTiyin: 480000000),
+  Future<List<Tender>> fetch({TenderStatus? status, DateTime? from, DateTime? to}) async {
+    final all = [
+      Tender(id: 1, title: 'Sement yetkazish', status: TenderStatus.active, amountInTiyin: 1250000000, createdAt: DateTime(2026, 8, 1)),
+      Tender(id: 2, title: 'Armatura', status: TenderStatus.closed, amountInTiyin: 480000000, createdAt: DateTime(2026, 8, 10)),
     ];
-    if (status == null) return all;
-    return all.where((t) => t.status == status).toList();
+    return all.where((t) {
+      if (status != null && t.status != status) return false;
+      if (from != null && t.createdAt.isBefore(from)) return false;
+      if (to != null && t.createdAt.isAfter(to)) return false;
+      return true;
+    }).toList();
   }
 }
