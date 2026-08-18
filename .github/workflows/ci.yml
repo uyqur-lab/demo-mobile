@@ -8,6 +8,8 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      AC_GATE_LAYER: MB
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
@@ -25,5 +27,5 @@ jobs:
       - name: Testlar
         run: flutter test --reporter=expanded
 
-      - name: Spec gate
-        run: bash .github/scripts/spec-guard.sh
+      - name: AC gate
+        run: bash .github/scripts/ac-gate.sh
