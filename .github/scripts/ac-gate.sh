@@ -14,6 +14,11 @@ TEST_DIRS="${AC_GATE_TEST_DIRS:-test integration_test}"
 LAYER="${AC_GATE_LAYER:-}"          # MB | FE | BE — bo'sh bo'lsa hammasi
 
 branch="${GITHUB_HEAD_REF:-$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')}"
+
+# Spec PR'lari kod keltirmaydi — ularda AC qamrovini talab qilish mantiqsiz.
+case "$branch" in
+  spec/*) echo "Spec PR ($branch) — AC gate o'tkazib yuborildi"; exit 0 ;;
+esac
 id="$(grep -oE 'CU-[a-zA-Z0-9]+' <<<"$branch" | head -1 || true)"
 
 if [ -z "$id" ]; then
