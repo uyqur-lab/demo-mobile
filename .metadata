@@ -1,0 +1,6 @@
+# Bu fayl Flutter asboblari uchun. Qo'lda tahrirlanmaydi.
+version:
+  revision: "db50e20168"
+  channel: "stable"
+
+project_type: app

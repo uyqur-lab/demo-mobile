@@ -1,0 +1,29 @@
+name: ci
+on:
+  pull_request:
+    branches: ["**"]
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable }
+
+      - run: flutter pub get
+
+      # `flutter analyze` platforma kataloglari yo'q loyihada crash qiladi —
+      # `dart analyze` bir xil natijani beradi va barqaror.
+      - name: Statik tahlil
+        run: dart analyze
+
+      - name: Testlar
+        run: flutter test --reporter=expanded
+
+      - name: Spec gate
+        run: bash .github/scripts/spec-guard.sh

@@ -1,0 +1,14 @@
+# Eslatma: `flutter analyze` platforma kataloglari yo'q loyihada crash qiladi,
+# shuning uchun CI'da `dart analyze` ishlatiladi.
+analyzer:
+  language:
+    strict-casts: true
+  errors:
+    todo: ignore
+
+linter:
+  rules:
+    - prefer_const_constructors
+    - prefer_final_locals
+    - avoid_print
+    - unnecessary_this

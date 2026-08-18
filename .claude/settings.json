@@ -1,0 +1,15 @@
+{
+  "extraKnownMarketplaces": {
+    "uyqur": {
+      "source": { "source": "github", "repo": "uyqur-lab/agent-standards" }
+    }
+  },
+  "enabledPlugins": { "uyqur-standards@uyqur": true },
+  "permissions": {
+    "deny": [
+      "mcp__clickup__clickup_update_task",
+      "mcp__clickup__clickup_create_task",
+      "mcp__clickup__clickup_create_comment"
+    ]
+  }
+}
