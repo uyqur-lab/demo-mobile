@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../../core/price_formatter.dart';
+import '../status/server_status.dart';
+import '../status/server_status_dot.dart';
 import 'tender.dart';
 import 'tender_list_controller.dart';
 
 class TenderListScreen extends StatefulWidget {
-  const TenderListScreen({super.key, required this.controller});
+  const TenderListScreen({
+    super.key,
+    required this.controller,
+    this.statusController,
+  });
   final TenderListController controller;
+  final ServerStatusController? statusController;
 
   @override
   State<TenderListScreen> createState() => _TenderListScreenState();
@@ -17,12 +24,19 @@ class _TenderListScreenState extends State<TenderListScreen> {
   void initState() {
     super.initState();
     widget.controller.load();
+    widget.statusController?.load();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tenderlar')),
+      appBar: AppBar(
+        title: const Text('Tenderlar'),
+        actions: [
+          if (widget.statusController != null)
+            ServerStatusDot(controller: widget.statusController!),
+        ],
+      ),
       body: AnimatedBuilder(
         animation: widget.controller,
         builder: (context, _) {
