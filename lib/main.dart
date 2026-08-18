@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+
+import 'features/status/server_status.dart';
 
 import 'features/tender/tender.dart';
 import 'features/tender/tender_list_controller.dart';
@@ -15,9 +20,13 @@ class DemoApp extends StatelessWidget {
     final controller = TenderListController(
       const TenderRepository(_InMemoryTenderApi()),
     );
+    final statusController = ServerStatusController(const HttpStatusApi());
     return MaterialApp(
       title: 'Uyqur demo',
-      home: TenderListScreen(controller: controller),
+      home: TenderListScreen(
+        controller: controller,
+        statusController: statusController,
+      ),
     );
   }
 }
@@ -37,5 +46,26 @@ class _InMemoryTenderApi implements TenderApi {
       if (to != null && t.createdAt.isAfter(to)) return false;
       return true;
     }).toList();
+  }
+}
+
+
+/// Kontrakt: uyqur-lab/contracts → GET /api/status
+/// Simulyatorda host mashina `localhost` orqali ko'rinadi.
+class HttpStatusApi implements StatusApi {
+  const HttpStatusApi({this.baseUrl = 'http://localhost:3000'});
+  final String baseUrl;
+
+  @override
+  Future<String> fetchStatus() async {
+    final client = HttpClient()..connectionTimeout = const Duration(seconds: 3);
+    try {
+      final request = await client.getUrl(Uri.parse('$baseUrl/api/status'));
+      final response = await request.close();
+      final body = await response.transform(utf8.decoder).join();
+      return (jsonDecode(body) as Map<String, dynamic>)['status'] as String;
+    } finally {
+      client.close();
+    }
   }
 }
