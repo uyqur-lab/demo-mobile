@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(const DemoApp());
+import 'features/hi/hi_api.dart';
+import 'features/hi/hi_controller.dart';
+import 'features/hi/hi_screen.dart';
+
+void main() => runApp(DemoApp(controller: HiController(HttpHiApi())));
 
 class DemoApp extends StatelessWidget {
-  const DemoApp({super.key});
+  const DemoApp({super.key, required this.controller});
+
+  final HiController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +20,7 @@ class DemoApp extends StatelessWidget {
         brightness: Brightness.dark,
         colorSchemeSeed: const Color(0xFF2F6FED),
       ),
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Uyqur')),
-        body: const Center(
-          child: Text("Bo'sh ekran. Funksiya hali qo'shilmagan."),
-        ),
-      ),
+      home: HiScreen(controller: controller),
     );
   }
 }
