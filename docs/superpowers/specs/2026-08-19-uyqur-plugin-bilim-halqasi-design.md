@@ -208,7 +208,27 @@ yoza olsa, MB devi `backend.md` ni ko'rmasdan turib ishni boshlay olmasa, va
    (`gh auth login` / Keychain / SSH), lekin buni amalda ko'rish shart.
    Ma'lum nuqsonlar: Windows'da SSH bug'i (claude-code#20589), `GITHUB_TOKEN`
    klonlashda ishlatilmasligi (claude-code#17201).
-2. **`tasks/` hajmi.** Yuzlab tasklardan keyin klon og'irlashadi. Zaxira yo'l:
+2. **Branch himoyasi data zonasini bloklaydi — implementatsiyada aniqlandi, HAL QILINMAGAN.**
+
+   `agent-standards` ning asosiy branchida "o'zgarish faqat PR orqali" qoidasi
+   va `verify` nomli majburiy status check bor. Ya'ni PM va QA task hujjatlarini
+   to'g'ridan-to'g'ri yubora **olmaydi** — GitHub ularni rad etadi. Demoda bu
+   faqat admin huquqi bilan chetlab o'tildi.
+
+   Bu §2.3 dagi "har kim o'z hujjatini yozadi" modelining asosini yeydi.
+   Uchta yechim bor:
+
+   | Yechim | Narxi |
+   |---|---|
+   | PR talabini olib tashlash | Plagin zonasi ham himoyasiz qoladi; review madaniyatga tayanadi |
+   | Ikki branch: plagin `main` da, `tasks/` alohida himoyalanmagan branchda | Ikki branch sinxronizatsiyasi, murakkabroq oyna klon |
+   | `tasks/` ni alohida repo'ga chiqarish | Ikki repo, ikki klon; bitta repo g'oyasi buziladi |
+
+   Eslatma: repo private qilinganda bepul org'da branch protection kuchini
+   yo'qotadi va muammo o'z-o'zidan yopiladi — lekin bu tasodifiy yechim,
+   dizayn emas.
+
+3. **`tasks/` hajmi.** Yuzlab tasklardan keyin klon og'irlashadi. Zaxira yo'l:
    `marketplace add --sparse` yoki `git-subdir` manba turi.
 
 ## 9. Ko'lamdan tashqari
