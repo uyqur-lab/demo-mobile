@@ -33,6 +33,20 @@ void main() {
     expect(_resultText(tester), 'Ism yuborilmadi');
   });
 
+  // ISSUE-1 regressiyasi: ekran kontrakt matnini o'zgartirmasligi kerak.
+  // Nuqson controller'da emas, ekran qatlamida edi — shuning uchun test
+  // aynan shu yerda kerak.
+  testWidgets('CU-86eyp4nmg AC-7: bo`sh ism javobi ekranda trim qilinmaydi',
+      (tester) async {
+    final api = FakeHiApi(status: 200, body: {'message': 'hi '});
+    await tester.pumpWidget(_app(HiController(api)));
+
+    await tester.tap(find.text('Yubor'));
+    await tester.pumpAndSettle();
+
+    expect(_resultText(tester), 'hi ');
+  });
+
   testWidgets('CU-86eyp4nmg AC-8: xatoda natija maydoni bo`sh qolmaydi',
       (tester) async {
     final api = FakeHiApi(shouldThrow: true);
