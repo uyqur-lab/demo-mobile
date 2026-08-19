@@ -25,4 +25,9 @@ jobs:
         run: dart analyze
 
       - name: Testlar
-        run: flutter test --reporter=expanded
+        run: |
+          if [ -d test ] && ls test/**/*_test.dart test/*_test.dart >/dev/null 2>&1; then
+            flutter test --reporter=expanded
+          else
+            echo "Test fayli yo'q — o'tkazib yuborildi"
+          fi

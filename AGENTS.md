@@ -37,4 +37,4 @@ Batafsil: `rules/dev-rules.md` §3 va `rules/role-rules.md`.
 ## Loyiha konvensiyalari
 
 - Mocking kutubxonasi yo'q — fake'lar `test/fakes/` da qo'lda yoziladi
-- Summalar tiyinda, `PriceFormatter` orqali (`docs/conventions/price-formatter.md`)
+- Mantiq widget'dan ajratiladi: controller/model testlanadi, ekran ulaydi
