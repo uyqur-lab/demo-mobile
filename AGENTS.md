@@ -1,34 +1,35 @@
 # Agent konteksti — demo-mobile
 
-Bu repo Uyqur AI delivery pipeline qoidalari bo'yicha ishlaydi.
-
-## Qatlam
-
-**MB (mobil)** — faqat `[MB]` yorlig'idagi AC'lar ustida ishlaysiz.
+Qatlam: **MB (mobil)**. Faqat `[MB]` yorlig'idagi AC'lar ustida ishlaysiz.
 
 ## Majburiy o'qish
 
 | Fayl | Qachon |
 |---|---|
-| `uyqur-standards` plugin → `rules/dev-rules.md` | har ish boshida |
-| `docs/specs/<CU-id>.md` | task boshida |
-| `docs/conventions/` | kod yozishdan oldin |
+| `~/.uyqur/agent-standards/rules/dev-rules.md` | har ish boshida |
+| `~/.uyqur/agent-standards/tasks/CU-<id>-*/` — **barcha** `.md` | task boshida |
+
+`backend.md` sizga API kontraktini beradi. **Backend kodini ko'rmaysiz** —
+kontraktga tayanasiz. U yozilmagan bo'lsa, BE devini kutasiz.
 
 ## Ish tartibi
 
-1. Spec `status: approved` ekanini tekshiring — `draft` bo'lsa to'xtang
-2. Branch: `versions/v<ver>/CU-<id>-<slug>`
-3. Kod va `AC-<n>:` bilan boshlanadigan testlar birga
-4. `/task-check` → `GATE: OCHIQ`
-5. `gh pr create`
+1. `/task-start <CU-id>` — hujjatlar o'qiladi, brief beriladi, branch ochiladi
+2. Kod va `<CU-id> AC-<n>:` bilan boshlanadigan testlar birga
+3. `/task-check` → `GATE: OCHIQ` va `mobile.md` yoziladi
+4. `gh pr create`
 
 ## Taqiqlar
 
-- `main` ga push yo'q, `git merge` yo'q, `gh pr merge` yo'q
-- ClickUp'ga yozish yo'q — faqat o'qish
-- Spec'dan tashqari refactor — alohida PR
+- Himoyalangan branch'larga to'g'ridan-to'g'ri yetkazish yo'q
+- Lokal birlashtirish va PR'ni yopish — inson qarori
+- ClickUp'ga yozish yo'q — dev faqat o'qiydi
+- Hujjatdan tashqari refactor — alohida PR
+- Boshqa qatlamning `<stack>.md` fayliga yozish yo'q — u faqat o'qish uchun
+
+Batafsil: `rules/dev-rules.md` §3 va `rules/role-rules.md`.
 
 ## Loyiha konvensiyalari
 
 - Mocking kutubxonasi yo'q — fake'lar `test/fakes/` da qo'lda yoziladi
-- Summalar tiyinda, `PriceFormatter` orqali (`docs/conventions/price-formatter.md`)
+- Mantiq widget'dan ajratiladi: model/controller testlanadi, ekran ulaydi
