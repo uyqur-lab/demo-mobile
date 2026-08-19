@@ -86,7 +86,10 @@ class _HiScreenState extends State<HiScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                view.text.trim(),
+                // Trim QILINMAYDI (ISSUE-1). Bo'sh ism uchun kontrakt javobi
+                // "hi " — orqasida bo'shliq bilan; ekran uni o'zgartirmaydi.
+                // Aks holda bir xil so'rovga FE va MB boshqa natija beradi.
+                view.text,
                 key: const Key('result'),
                 style: TextStyle(
                   fontFamily: 'monospace',
