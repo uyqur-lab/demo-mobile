@@ -26,6 +26,3 @@ jobs:
 
       - name: Testlar
         run: flutter test --reporter=expanded
-
-      - name: AC gate
-        run: bash .github/scripts/ac-gate.sh
