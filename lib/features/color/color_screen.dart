@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'color_controller.dart';
 
@@ -80,6 +81,20 @@ class _ColorScreenState extends State<ColorScreen> {
                     color: isError ? Theme.of(context).colorScheme.error : null,
                   ),
                 ),
+                if (view.kind == ColorViewKind.ok) ...[
+                  const SizedBox(width: 8),
+                  IconButton(
+                    key: const Key('copy-color-code'),
+                    onPressed: () async {
+                      await Clipboard.setData(ClipboardData(text: view.code));
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Kod nusxalandi')),
+                      );
+                    },
+                    icon: const Icon(Icons.copy),
+                  ),
+                ],
               ],
             ),
           ],
